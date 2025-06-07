@@ -78,7 +78,7 @@ However, moving to a completely different backend would primarily involve rewrit
 
 #### Areas of Tighter Coupling:
 - Endpoint String Literals: The switch statement uses string literals like 'account', 'accounts', 'markets', etc. These strings are directly tied to the backend's expected routes. If the backend changes an endpoint name (e.g., from /account to /user), we'd need to update this file.
-- Specific Query Parameters/Paths: Many of the case statements define specific query parameters (e.g., ?query=${id}&limit=${limit || 10}&sort=...) and path structures (e.g., /account/${id}/address). These directly reflect the backend's API design.
+- Specific Query Parameters/Paths: Many of the case statements define specific query parameters (e.g., `?query=${id}&limit=${limit || 10}&sort=...`) and path structures (e.g., /account/${id}/address). These directly reflect the backend's API design.
 - Implicit Contract: While the URLs are constructed, the meaning of `id`, `secondaryId`, `limit`, and `sort` for each endpoint is implicitly understood between frontend and backend. Any backend change is “invisible” until we manually run the code and see broken pages or HTTP-404s.
 
 ### 2. use-fetch-helper.ts (Fetcher):
@@ -126,15 +126,18 @@ Overall, the codebase demonstrates clear, consistent naming and generally sound 
 ### 1. Naming Conventions
 
 Across the application, naming conventions are generally clear and self-descriptive:
+
 - Store Getters and Actions: In the Pinia store, methods like `getAccountId`, `getStripeCustomerID`, and `setCustomerName` immediately convey their purpose. The state properties (`id`, `email, addresses`, `guarantorsList`) match domain concepts precisely.
 - Component Props and Functions: In the Payments‐row component, props are defined as `{ id: string; onClick: () => void; data: PaymentsData }`, so it’s evident that `data` holds a `PaymentsData` object, and `onClick` is the refund handler. Helper functions like `getTransactions()` and `getTotal()` read naturally—one returns a joined transaction list, the other computes a total amount.
 - Composables: In the Nuxt page, composables such as `useI18n` and `useAppStore` follow standard Vue/Nuxt patterns. Computed hooks named `initHistory` and `initCards` clearly indicate initialization logic for page data.
 - `HistoryData` and `HomeCardProps` types are imported from `types/interfaces`, which implies a centralized, descriptive taxonomy of the domain.
-- Overall, identifiers across state, methods, props, and templates are concise and meaningful, reflecting each item’s role without ambiguity.
+
+Overall, identifiers across state, methods, props, and templates are concise and meaningful, reflecting each item’s role without ambiguity.
 
 ### 2. Code Consistency
 
 Overall, each file adheres to a coherent style guide, with consistent indentation, brace placement, and logical grouping of code sections.
+
 - Indentation & Spacing: All files use consistent two‐space indentation. Imports are grouped at the top, followed by component or store definitions. Blank lines are used to separate logical sections (e.g., between `state, getters`, and `actions` in the Pinia store), aiding readability.
 - Curly Braces & Parentheses: Arrow functions and object literals open and close braces predictably. In the Nuxt page and component scripts, multi‐line objects (such as prop definitions and computed return values) maintain aligned braces and indentation.
 - Quotes & Semicolons: While there are minor variations (some imports use single quotes, others double), each file consistently applies its chosen style within itself. Semicolons appear reliably at the end of statements in the store and test, and object/array literals follow a stable pattern of commas and line breaks.
@@ -144,6 +147,7 @@ Overall, each file adheres to a coherent style guide, with consistent indentatio
 ### 3. Use of TypesScript (Types / Interfaces)
 
 Across the four files, TypeScript usage is deliberate and structured:
+
 - Pinia Store:
   - Defines an `AppState` interface listing each state property (`id: string`, `addresses: AddressData[]`, etc.).
   - Getters and actions are explicitly typed (e.g. `getAccountId(): string, setNote(note: NotesData): void`).
@@ -157,11 +161,13 @@ Across the four files, TypeScript usage is deliberate and structured:
 - Vitest Test:
   - Though focused on runtime stubbing, the test declares `const MOCK_STRING: string` to satisfy the component’s prop types.
   - When stubbing `useFetch`, the returned object mimics the shape `{ data: { value: Partial<PaymentsData> } }` so TypeScript will flag any missing or mismatched fields.
-- Overall, each file leverages TypeScript interfaces and type annotations—on state, props, computed values, and mocked data—to enforce correct shapes and reduce runtime errors.
+
+Overall, each file leverages TypeScript interfaces and type annotations—on state, props, computed values, and mocked data—to enforce correct shapes and reduce runtime errors.
 
 ### 4. Error Handling
 
-Across the four files, error handling is present but largely implicit:
+Across the application files, error handling is present but largely implicit:
+
 - Pinia Store
   - Contains no direct network calls, so it does not include error‐handling logic. Any fetch errors would need to be caught by the components or composables that populate state before calling store actions.
 - Nuxt 3 Index Page
@@ -170,11 +176,13 @@ Across the four files, error handling is present but largely implicit:
   - Does not perform its own fetch; it receives fully formed `PaymentsData`. As written, it assumes valid data and could produce runtime issues if, for example, `data.payment_information` is missing or malformed. There are no try/catch guards around utility calls like `displayDate` or `formatPrice`.
 - Vitest Unit Test
   - Stubs `useFetch` to return a successful payload; it does not test error cases. There is no assertion or setup for handling fetch failures, so the test suite does not exercise any error‐handling branches.
-- In summary, error handling exists at the fetcher/composable level (showing generic toasts), but individual pages and components do not explicitly guard against fetch errors or invalid data shapes. The unit test similarly focuses on a successful fetch scenario and does not validate how the component behaves under error conditions. This is something that needs further work, especially in the Customer Creation Flow.
+
+In summary, error handling exists at the fetcher/composable level (showing generic toasts), but individual pages and components do not explicitly guard against fetch errors or invalid data shapes. The unit test similarly focuses on a successful fetch scenario and does not validate how the component behaves under error conditions. This is something that needs further work, especially in the Customer Creation Flow.
 
 ### 5. Readability and Comments
 
 Throughout the application, readability is generally strong and comments are used sparingly but effectively:
+
 - Pinia Store
   - The top-of-file comment clearly explains the store’s purpose (holding selected account data, not the authenticated user).
   - State properties, getters, and actions are grouped logically, with blank lines separating each section.
@@ -193,28 +201,32 @@ Throughout the application, readability is generally strong and comments are use
   - The `beforeEach` block groups all global stubs together; while no inline comments explain each stub, the stub names (e.g., "useRoute", "useI18n") make their purpose evident.
   - The `it.skip`("should open a modal") test is concise, with each assertion on its own line and a clear sequence: mount → find button → click → assert modal state.
   - Overall, the test reads like a step-by-step scenario without needing extensive comments.
-- In summary, the application favors clear naming, small focused functions, and logically grouped sections. Comments are used only when helpful (e.g., explaining filter logic or the store’s role), and otherwise the code’s structure and identifiers guide the reader through each file.
+
+In summary, the application favors clear naming, small focused functions, and logically grouped sections. Comments are used only when helpful (e.g., explaining filter logic or the store’s role), and otherwise the code’s structure and identifiers guide the reader through each file.
 
 ### 6. Test Coverage
-- The test suite is organized into clearly separated folders—components, composables, pages, and stores—so every part of the app has its own dedicated spec file.
+The test suite is organized into clearly separated folders—components, composables, pages, and stores—so every part of the app has its own dedicated spec file.
+
 - Under pages/account, each section (History, Invoices, Notes, Payments, Related Accounts, Subscription) has its own test file, and there are also top‐level page tests for things like `admin-roles`, `customer-account`, `payment`, and `profile`.
 - In components, files like `BaseInput.test.ts`, `DynamicBreadcrumbs.test.ts`, and `ReportTable.test.ts` ensure that individual UI pieces render and behave correctly.
 - The composables folder contains tests for apiUrlHelper and other helper methods, verifying that URL construction and utility functions work as expected. Although the `payment.test.ts` spec is currently skipped, it demonstrates how `useFetch` is stubbed to simulate data and how UI interactions (opening a refund modal) are checked.
 - Tests in pages/account/ are currently incomplete and still need to be worked on.
-- Overall, most core modules—pages, components, and composables—have at least one corresponding test file, giving broad coverage of rendering and basic functionality across the codebase. Some tests still need to be added or completed.
+
+Overall, most core modules—pages, components, and composables—have at least one corresponding test file, giving broad coverage of rendering and basic functionality across the codebase. Some tests still need to be added or completed.
 
 ## Component Modularity
 
-The application’s UI is built from a clear hierarchy of modular components, ranging from small, reusable “base” elements (like buttons, menus, and form wrappers) to larger, page‐specific containers that assemble those pieces into complete screens. Presentational components (e.g., <BaseMenu> or the one‐step form wrapper) focus solely on layout and styling, exposing flexible props and slots for maximum reuse. Page‐level components (such as the payment details page) compose these building blocks while also handling data‐fetching and business logic, but still delegate most UI concerns to child components. This organization ensures that individual units follow single‐responsibility principles—pure UI elements remain independent of domain logic, and larger containers orchestrate data and presentation without entangling internal rendering details.
+The application’s UI is built from a clear hierarchy of modular components, ranging from small, reusable “base” elements (like buttons, menus, and form wrappers) to larger, page‐specific containers that assemble those pieces into complete screens. Presentational components (e.g., `<BaseMenu>` or the one‐step form wrapper) focus solely on layout and styling, exposing flexible props and slots for maximum reuse. Page‐level components (such as the payment details page) compose these building blocks while also handling data‐fetching and business logic, but still delegate most UI concerns to child components. This organization ensures that individual units follow single‐responsibility principles—pure UI elements remain independent of domain logic, and larger containers orchestrate data and presentation without entangling internal rendering details.
 
 Some examples of components exhibit a clear separation of concerns and strong reuse potential:
-- BaseMenu.vue is a reusable presentational component: it accepts a generic `items` array and optional `componentStyle` props, and exposes a default slot inside the <Menu> wrapper. Its sole responsibility is rendering a toggle button and dropdown, with no business logic mixed in.
+- BaseMenu.vue is a reusable presentational component: it accepts a generic `items` array and optional `componentStyle` props, and exposes a default slot inside the `<Menu>` wrapper. Its sole responsibility is rendering a toggle button and dropdown, with no business logic mixed in.
 - [payment].vue is a page‐level container that composes smaller building blocks (e.g., `<DynamicBreadCrumbs>`, `<BaseMenu>`, and `<SeparatorComponent>`) while also handling data fetching, state management (via `fetchPaymentDetails` and `fetchPaidInvoices`), and computed totals. Although it combines layout and domain logic, it delegates most rendering to child components, keeping each unit focused on its own concern.
 - The one‐step Form wrapper serves purely as a layout shell: it renders a header and footer around a `<slot />` where actual form fields live. By accepting `title`, `cancelLink`, `onSubmit`, and `initialValues` as props, it remains agnostic of specific form content and can be reused for any single‐step form across the app.
 - UI Kit Directory: The components/ui-kit folder houses a collection of reusable base components (e.g., `BaseButton.vue`, `BaseInput.vue`, `BaseCard.vue`, `BaseModal.vue`, etc.), providing a centralized library of generic UI building blocks that can be used consistently across different pages and features.
 - Compound Multi‐Step Forms: Multi‐step forms leverage a compound‐component pattern—each step lives in its own .vue file (e.g., `StepOne.vue`, `StepTwo.vue`), and the parent <Form> dynamically renders the current step via `<component :is="currentStepComponent" />`. Shared pieces like the header (`<LazyFormsMultistepHeader>`) and footer (`<LazyFormsMultistepFooter>`) wrap around the slot, ensuring each step component remains focused on its own UI and logic.
 - Helper Composable of Utility Methods: A centralized composable exposes reusable functions—such as `toggleBoolean`, `sumCharges`, `prevStep`, `capitalizeWord`, `formatPhoneNumber`, `extractUrlTail`, and HTML sanitizers (`removeScriptsTags`, `sanitizeHTML`)—to perform common tasks (string/number formatting, step navigation, HTML cleaning) across multiple components.
-- In each case, props and slots are leveraged thoughtfully—presentational components expose only what they need, and container components aggregate those pieces into pages without bleeding layout details into business logic. Common functions are organized into a dedicated helper composable, providing reusable utilities for tasks.
+
+In each case, props and slots are leveraged thoughtfully—presentational components expose only what they need, and container components aggregate those pieces into pages without bleeding layout details into business logic. Common functions are organized into a dedicated helper composable, providing reusable utilities for tasks.
 
 ## Areas to Improve
 
