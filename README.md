@@ -1,5 +1,7 @@
 # Technical Report for Subscription Manager V2
 
+The Subscription Manager is a Nuxt 3 application built to support internal users in configuring and provisioning subscription-based service plans. It enables the dynamic assembly of recurring and one-time components across multiple steps, with real-time validation and pricing logic driven by backend APIs. The app is structured around a modular component architecture with clear separation between container and presentational layers, ensuring maintainability and scalability. Key technical features include composables for shared logic, API integration for account lifecycle management, and a centralized state-driven form workflow that supports conditional rendering, user input validation, and step transitions. Designed for telecom or utility-style use cases, the system abstracts complex billing logic behind a user-friendly interface while maintaining a clean codebase suitable for extension and testing.
+
 ## Tech Stack
 
 This project uses a modern, modular frontend stack built on Nuxt 3 and integrates a variety of tools and services to support internationalization, state management, authentication, testing, and UI design.
